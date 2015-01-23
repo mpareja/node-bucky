@@ -3,7 +3,11 @@
 <img align="right" height="220px" src="public/logo.jpg" />
 Let Bucky help you produce Rabbit messages and assert that your systems are generating the expected messages in response.
 
-# Example
+## Current Status: Experimental
+
+This module is still very experimental. Use at your own risk since the API will likely change before v1.0.
+
+## Example
 
 This example demonstrates publishing a message to a rabbit connection and verifying that a different message was produced by the system under test.
 
@@ -36,6 +40,6 @@ bucky(connection)
   });
 ```
 
-# What's with the name?
+## What's with the name?
 
 Bucky is inspired by [supertest](https://github.com/tj/supertest). Rather than use something unoriginal like `superrabbit`, it made sense to name the module after superhero rabbit [Bucky O'Hare](http://www.buckyohare.org/).
