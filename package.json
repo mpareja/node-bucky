@@ -1,0 +1,31 @@
+{
+  "name": "bucky",
+  "version": "0.0.1",
+  "description": "Integration test services using RabbitMQ for messaging.",
+  "main": "index.js",
+  "scripts": {
+    "test": "istanbul cover ./node_modules/mocha/bin/_mocha -- --recursive --reporter ${MOCHA_REPORTER:-spec} && jslint --devel --node --vars --maxerr=100 --indent=2 --sloppy=true --nomen=true --undef --plusplus --minusminus -- *.js ./test/*.js && istanbul check-coverage --statement 100 --branch 100 --function 100",
+    "cov": "istanbul cover ./node_modules/mocha/bin/_mocha -- --recursive --ui bdd -R spec -t 5000; x-www-browser ./coverage/lcov-report/index.html"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:mpareja/node-bucky.git"
+  },
+  "keywords": [
+    "rabbitmq",
+    "rabbit",
+    "test"
+  ],
+  "author": "Mario Pareja",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mpareja/node-bucky/issues"
+  },
+  "homepage": "https://github.com/mpareja/node-bucky",
+  "devDependencies": {
+    "istanbul": "^0.3.5",
+    "jslint": "^0.7.2",
+    "mocha": "^2.1.0",
+    "sinon": "^1.12.2"
+  }
+}
