@@ -38,4 +38,4 @@ bucky(connection)
 
 # What's with the name?
 
-Bucky is inspired by [supertest](https://github.com/tj/supertest). Rather than use something unoriginal like `superrabbit`, it made sense to name the module after superhero rabbit (Bucky O'Hare)[http://www.buckyohare.org/].
+Bucky is inspired by [supertest](https://github.com/tj/supertest). Rather than use something unoriginal like `superrabbit`, it made sense to name the module after superhero rabbit [Bucky O'Hare](http://www.buckyohare.org/).
