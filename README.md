@@ -31,7 +31,7 @@ bucky(connection)
     }
   })
   .end(function (err) {
-    if (err) { throw; }
+    if (err) { throw err; }
     console.log('Success!');
   });
 ```
