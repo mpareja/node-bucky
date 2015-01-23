@@ -1,12 +1,6 @@
 module.exports = function (amqp) {
   var queue = [];
 
-  setImmediate(function () {
-    queue.forEach(function (data) {
-      amqp.produce(data);
-    });
-  });
-
   var instance = {
     produce: function (data) {
       queue.push(data);
@@ -18,6 +12,14 @@ module.exports = function (amqp) {
         routingKey: data.routingKey
       });
       return instance;
+    },
+    end: function (cb) {
+      setImmediate(function () {
+        queue.forEach(function (data) {
+          amqp.produce(data);
+        });
+        cb(null);
+      });
     }
   };
 

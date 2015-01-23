@@ -1,4 +1,5 @@
 /*globals describe, it */
+var assert = require('chai').assert;
 var bucky = require('../');
 var sinon = require('sinon');
 
@@ -34,17 +35,17 @@ describe('bucky', function () {
     done();
   });
 
-  it('begins sending messages next time around the event loop', function (done) {
+  it('sends messages that it was told to send', function (done) {
     var amqp = { produce: sinon.spy() };
 
     bucky(amqp)
-      .produce(inputMessage);
-
-    setImmediate(function () {
-      sinon.assert.calledOnce(amqp.produce);
-      sinon.assert.calledWith(amqp.produce, inputMessage);
-      done();
-    });
+      .produce(inputMessage)
+      .end(function (err) {
+        assert.isNull(err);
+        sinon.assert.calledOnce(amqp.produce);
+        sinon.assert.calledWith(amqp.produce, inputMessage);
+        done();
+      });
   });
 
   it('binds message queue to the exchange and routing key we expect to get a message on', function (done) {
@@ -54,16 +55,16 @@ describe('bucky', function () {
     };
 
     bucky(amqp)
-      .expect(inputMessage);
-
-    setImmediate(function () {
-      sinon.assert.calledOnce(amqp.consume);
-      sinon.assert.calledWith(amqp.consume, {
-        exchange: 'data',
-        routingKey: 'user'
+      .expect(inputMessage)
+      .end(function (err) {
+        assert.isNull(err);
+        sinon.assert.calledOnce(amqp.consume);
+        sinon.assert.calledWith(amqp.consume, {
+          exchange: 'data',
+          routingKey: 'user'
+        });
+        done();
       });
-      done();
-    });
   });
 
   it('starts listening for expected messages before producing messages', function (done) {
@@ -74,11 +75,11 @@ describe('bucky', function () {
 
     bucky(amqp)
       .produce(inputMessage)
-      .expect(outputMessage);
-
-    setImmediate(function () {
-      sinon.assert.callOrder(amqp.consume, amqp.produce);
-      done();
-    });
+      .expect(outputMessage)
+      .end(function (err) {
+        assert.isNull(err);
+        sinon.assert.callOrder(amqp.consume, amqp.produce);
+        done();
+      });
   });
 });
