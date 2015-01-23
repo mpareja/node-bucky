@@ -1,4 +1,4 @@
-# Bucky - integration test your RabbitMQ services
+# Bucky - test your RabbitMQ services
 
 <img align="right" height="220px" src="public/logo.jpg" />
 Let Bucky help you produce Rabbit messages and assert that your systems are generating the expected messages in response.
