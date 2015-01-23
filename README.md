@@ -1,13 +1,16 @@
 # Bucky - integration test your RabbitMQ services
 
+<img align="right" height="250px" src="public/logo.jpg" />
 Let Bucky help you produce Rabbit messages and assert that your systems are generating the expected messages in response.
 
 # Example
 
+This example demonstrates publishing a message to a rabbit connection and verifying that a different message was produced by the system under test.
+
+```
 var connection = require('./rabbit-connection.js');
 var bucky = require('bucky');
 
-```
 bucky(connection)
   .produce({
     exchange: 'data',
