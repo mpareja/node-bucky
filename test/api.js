@@ -48,23 +48,27 @@ describe('bucky', function () {
       });
   });
 
-  it('binds message queue to the exchange and routing key we expect to get a message on', function (done) {
+  it('starts listening for expected messages before producing messages', function (done) {
     var amqp = {
-      produce: sinon.spy(),
-      consume: sinon.spy()
+      bind: sinon.stub().yieldsAsync([ null ]), // pretend we bound and execute callback
+      consume: sinon.stub().callsArgWithAsync(2, null), // pretend we're listening to queue
+      produce: function () {
+        sinon.assert.calledOnce(amqp.bind);
+        sinon.assert.calledWith(amqp.bind, sinon.match({
+          exchange: outputMessage.exchange,
+          routingKey: outputMessage.routingKey
+        }));
+
+        var queue = amqp.bind.args[0][0].queue;
+        sinon.assert.calledOnce(amqp.consume);
+        sinon.assert.calledWith(amqp.consume, queue);
+      }
     };
 
     bucky(amqp)
-      .expect(inputMessage)
-      .end(function (err) {
-        assert.isNull(err);
-        sinon.assert.calledOnce(amqp.consume);
-        sinon.assert.calledWith(amqp.consume, {
-          exchange: 'data',
-          routingKey: 'user'
-        });
-        done();
-      });
+      .produce(inputMessage)
+      .expect(outputMessage)
+      .end(done);
   });
 
   it('starts listening for expected messages before producing messages', function (done) {
@@ -82,4 +86,7 @@ describe('bucky', function () {
         done();
       });
   });
+
+  it('handles errors binding queues to exchanges');
+  it('handles errors setting up consumption from a queue');
 });
