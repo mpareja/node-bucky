@@ -62,31 +62,80 @@ describe('bucky', function () {
         var queue = amqp.bind.args[0][0].queue;
         sinon.assert.calledOnce(amqp.consume);
         sinon.assert.calledWith(amqp.consume, queue);
+        done();
       }
     };
 
     bucky(amqp)
       .produce(inputMessage)
       .expect(outputMessage)
-      .end(done);
+      .end(function () { return; });
   });
 
-  it('starts listening for expected messages before producing messages', function (done) {
+  it('times out while waiting for the expected message to arrive', function (done) {
+    this.timeout(100); // be explicit about mocha timeout value
+
     var amqp = {
-      produce: sinon.spy(),
-      consume: sinon.spy()
+      bind: sinon.stub().yieldsAsync([ null ]), // pretend we bound and execute callback
+      consume: sinon.stub().callsArgWithAsync(2, null), // pretend we're listening to queue
+      produce: sinon.spy()
     };
 
     bucky(amqp)
-      .produce(inputMessage)
+      .timeout(50)
       .expect(outputMessage)
       .end(function (err) {
-        assert.isNull(err);
-        sinon.assert.callOrder(amqp.consume, amqp.produce);
+        assert.instanceOf(err, Error);
         done();
       });
   });
 
+  it('completes when an expected message is received', function (done) {
+    var receivedMessage = {
+      content: new Buffer(''),
+      fields: {},
+      properties: {}
+    };
+
+    /*jslint unparam:false */
+    var amqp = {
+      produce: sinon.spy(),
+      bind: sinon.stub().yieldsAsync([ null ]), // pretend we bound and execute callback
+      consume: function (queue, handler, cb) {
+        /*jslint unparam:true */
+
+        setImmediate(function () {
+          // notify that we're listening to queue
+          cb(null);
+
+          // pretend a message was received
+          setTimeout(function () {
+            handler(receivedMessage);
+          }, 50);
+        });
+      }
+    };
+
+    var endCalled = false;
+
+    bucky(amqp)
+      .timeout(55)
+      .expect({
+        exchange: 'emails',
+        routingKey: 'newUserRegistration',
+        payload: new Buffer('')
+      })
+      .end(function (err) {
+        assert.isFalse(endCalled); // shouldn't get timeout callback on success
+        assert.isNull(err);
+        endCalled = true;
+        setTimeout(done, 50);
+      });
+  });
+
+  it('completes after ALL expected messages are received'); // refactor other expected messages test
   it('handles errors binding queues to exchanges');
   it('handles errors setting up consumption from a queue');
+  it('handles multiple expectations for the same exchange/routingKey combination');
+  it('cleans up after itself');
 });
