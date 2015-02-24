@@ -94,6 +94,7 @@ describe('amqplib support', function () {
   });
 
   describe('produce', function () {
+    var channel;
     beforeEach(function (done) {
       connect('amqp://guest:guest@localhost:5672', function (err, chan) {
         channel = chan;
