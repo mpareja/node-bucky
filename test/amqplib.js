@@ -1,11 +1,12 @@
-/*globals describe, it, before */
+/*globals describe, it, beforeEach */
 var assert = require('chai').assert;
 var sinon = require('sinon');
 var amqplibConnect = require('../lib/amqplib');
 
 function getStubAmqplib() {
   var channel = {
-    bindQueue: sinon.stub().yieldsAsync(null)
+    bindQueue: sinon.stub().yieldsAsync(null),
+    publish: sinon.stub()
   };
 
   var connection = {
@@ -91,6 +92,51 @@ describe('amqplib support', function () {
         assert.isNull(err);
         channel.consume('myQueue', handler, callback);
       });
+    });
+  });
+
+  describe('produce', function () {
+    var channel, stub;
+    beforeEach(function (done) {
+      stub = getStubAmqplib();
+      var connect = amqplibConnect(stub);
+      connect('amqp://guest:guest@localhost:5672', function (err, chan) {
+        channel = chan;
+        done(err);
+      });
+    });
+
+    it('can produce a message on an exchange', function (done) {
+      var inputMessage = {
+        exchange: 'data',
+        routingKey: 'user',
+        payload: {
+          id: '1a2b3c',
+          name: 'John Doe'
+        }
+      };
+      channel.produce(inputMessage);
+
+      sinon.assert.calledWith(stub.channel.publish, 'data', 'user', inputMessage.payload);
+      done();
+    });
+
+    it('can produce message with a content type', function (done) {
+      var inputMessage = {
+        exchange: 'data',
+        routingKey: 'user',
+        contentType: 'application/json',
+        payload: {
+          id: '1a2b3c',
+          name: 'John Doe'
+        }
+      };
+      channel.produce(inputMessage);
+
+      sinon.assert.calledWith(stub.channel.publish, 'data', 'user', inputMessage.payload, {
+        contentType: 'application/json'
+      });
+      done();
     });
   });
 });
