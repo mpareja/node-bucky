@@ -4,7 +4,7 @@
   "description": "Integration test services using RabbitMQ for messaging.",
   "main": "index.js",
   "scripts": {
-    "test": "istanbul cover ./node_modules/mocha/bin/_mocha -- --recursive --reporter ${MOCHA_REPORTER:-spec} && jslint --devel --node --vars --maxerr=100 --indent=2 --sloppy=true --nomen=true --undef --plusplus --minusminus -- *.js ./test/*.js && istanbul check-coverage --statement 100 --branch 100 --function 100",
+    "test": "istanbul cover ./node_modules/mocha/bin/_mocha -- --recursive --reporter ${MOCHA_REPORTER:-spec} && jslint --devel --node --vars --maxerr=100 --indent=2 --sloppy=true --nomen=true --undef --plusplus --minusminus -- *.js ./lib/*.js ./test/*.js && istanbul check-coverage --statement 100 --branch 100 --function 100",
     "cov": "istanbul cover ./node_modules/mocha/bin/_mocha -- --recursive --ui bdd -R spec -t 5000; x-www-browser ./coverage/lcov-report/index.html"
   },
   "repository": {
@@ -30,6 +30,7 @@
     "sinon": "^1.12.2"
   },
   "dependencies": {
+    "amqplib": "^0.3.1",
     "async": "^0.9.0",
     "debug": "^2.1.1"
   }
